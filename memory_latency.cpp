@@ -44,7 +44,7 @@ struct measurement measure_sequential_latency(uint64_t repeat, array_element_t* 
     register uint64_t rnd=12345;
     for (register uint64_t i = 0; i < repeat; i++)
     {
-    register uint64_t index = rnd % arr_size;
+    register uint64_t index = i % arr_size;
         rnd ^= index & zero;
         rnd = (rnd >> 1) ^ ((0 - (rnd & 1)) & GALOIS_POLYNOMIAL);
     }
