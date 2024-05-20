@@ -36,6 +36,7 @@ struct measurement measure_sequential_latency(uint64_t repeat, array_element_t* 
 {
     // Your code here
     repeat = arr_size > repeat ? arr_size:repeat; // Make sure repeat >= arr_size
+	
 
     // Baseline measurement:
     struct timespec t0;
@@ -43,9 +44,9 @@ struct measurement measure_sequential_latency(uint64_t repeat, array_element_t* 
     register uint64_t rnd=12345;
     for (register uint64_t i = 0; i < repeat; i++)
     {
-        register uint64_t index = i % arr_size;
+    register uint64_t index = rnd % arr_size;
         rnd ^= index & zero;
-        rnd = (rnd >> 1) ^ ((0-(rnd & 1)) & GALOIS_POLYNOMIAL);  // Advance rnd pseudo-randomly (using Galois LFSR)
+        rnd = (rnd >> 1) ^ ((0 - (rnd & 1)) & GALOIS_POLYNOMIAL);
     }
     struct timespec t1;
     timespec_get(&t1, TIME_UTC);
@@ -58,7 +59,8 @@ struct measurement measure_sequential_latency(uint64_t repeat, array_element_t* 
     {
         register uint64_t index = i % arr_size;
         rnd ^= arr[index] & zero;
-        rnd = (rnd >> 1) ^ ((0-(rnd & 1)) & GALOIS_POLYNOMIAL);  // Advance rnd pseudo-randomly (using Galois LFSR)
+        rnd = (rnd >> 1) ^ ((0 - (rnd & 1)) & GALOIS_POLYNOMIAL);  // Advance rnd pseudo-randomly (using Galois LFSR)
+        
     }
     struct timespec t3;
     timespec_get(&t3, TIME_UTC);
