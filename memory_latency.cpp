@@ -3,6 +3,9 @@
 #include "memory_latency.h"
 #include "measure.h"
 #include <math.h>
+#include <ctime>   // For time
+//#include <thread> // For std::this_thread::sleep_for
+//#include <chrono> // For std::chrono::seconds
 
 #define GALOIS_POLYNOMIAL ((1ULL << 63) | (1ULL << 62) | (1ULL << 60) | (1ULL << 59))
 #define NANOSECOND 1000000000ULL
@@ -40,7 +43,7 @@ struct measurement measure_sequential_latency(uint64_t repeat, array_element_t* 
     register uint64_t rnd=12345;
     for (register uint64_t i = 0; i < repeat; i++)
     {
-        register uint64_t index = rnd % arr_size;
+        register uint64_t index = i % arr_size;
         rnd ^= index & zero;
         rnd = (rnd >> 1) ^ ((0-(rnd & 1)) & GALOIS_POLYNOMIAL);  // Advance rnd pseudo-randomly (using Galois LFSR)
     }
@@ -53,8 +56,8 @@ struct measurement measure_sequential_latency(uint64_t repeat, array_element_t* 
     rnd=(rnd & zero) ^ 12345;
     for (register uint64_t i = 0; i < repeat; i++)
     {
-        //register uint64_t index = rnd % arr_size;
-        rnd ^= arr[i] & zero;
+        register uint64_t index = i % arr_size;
+        rnd ^= arr[index] & zero;
         rnd = (rnd >> 1) ^ ((0-(rnd & 1)) & GALOIS_POLYNOMIAL);  // Advance rnd pseudo-randomly (using Galois LFSR)
     }
     struct timespec t3;
@@ -87,6 +90,8 @@ struct measurement measure_sequential_latency(uint64_t repeat, array_element_t* 
  */
 int main(int argc, char* argv[])
 {
+	std::srand(std::time(0));
+
     // zero==0, but the compiler doesn't know it. Use as the zero arg of measure_latency and measure_sequential_latency.
     struct timespec t_dummy;
     timespec_get(&t_dummy, TIME_UTC);
@@ -113,6 +118,11 @@ int main(int argc, char* argv[])
             printf("Failed to allocate memory");
             return -1;
         }
+         //for (size_t i = 0; i < arr_size; ++i) {
+        //arr[i] = std::rand() % 10000; // Random numbers between 0 and 99
+        //printf("%d\n" , arr[i]);
+        //std::this_thread::sleep_for(std::chrono::seconds(1));
+    //}
         struct measurement measure_sequential_result  = measure_sequential_latency(repeat, arr, arr_size, zero);
         struct measurement measure_random_result = measure_latency(repeat, arr, arr_size, zero);
 

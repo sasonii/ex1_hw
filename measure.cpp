@@ -40,6 +40,7 @@ struct measurement measure_latency(uint64_t repeat, array_element_t* arr, uint64
     {
         register uint64_t index = rnd % arr_size;
         rnd ^= arr[index] & zero;
+        //printf("%d\n", rnd);
         rnd = (rnd >> 1) ^ ((0-(rnd & 1)) & GALOIS_POLYNOMIAL);  // Advance rnd pseudo-randomly (using Galois LFSR)
     }
     struct timespec t3;
